@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict
 
 from app.routers import DerivationType, SeedType
 
-router: APIRouter = APIRouter(prefix="/hdwallet")
+router: APIRouter = APIRouter(prefix="/keypair")
 
 
 async def internal_bip32_derivation(seed: str, derivation: str) -> BIP32HD:
@@ -30,7 +30,7 @@ class Bip32Derivation(Bip32Seed):
 
 
 @router.get(
-    "/derivation/{derivation:path}",
+    "/from_derivation/{derivation:path}",
     description="HD Wallet Derivation",
     tags=["BIP 32"],
 )
@@ -42,7 +42,7 @@ async def get_bip32_derivation(
     return {"pubkey": hdwallet.xpublic_key(), "prvkey": hdwallet.xprivate_key()}
 
 
-@router.post("/derivation/", description="HD Wallet Derivation", tags=["BIP 32"])
+@router.post("/from_derivation/", description="HD Wallet Derivation", tags=["BIP 32"])
 async def post_bip32_derivation(payload: Bip32Derivation):
     seed = payload.seed
     derivation = payload.derivation

@@ -20,13 +20,19 @@ async def internal_bip32_derivation(seed: str, derivation: str) -> BIP32HD:
     return hdwallet
 
 
-class Bip32Seed(BaseModel):
+class SeedBody(BaseModel):
     model_config: ClassVar[ConfigDict] = ConfigDict(extra="forbid")
     seed: SeedType
 
 
-class Bip32Derivation(Bip32Seed):
+class DerivationBody(SeedBody):
     derivation: DerivationType = "m"
+
+
+class Keypair(BaseModel):
+    model_config: ClassVar[ConfigDict] = ConfigDict(extra="forbid")
+    pubkey: str | None
+    prvkey: str | None
 
 
 @router.get(
@@ -35,16 +41,16 @@ class Bip32Derivation(Bip32Seed):
     tags=["BIP 32"],
 )
 async def get_bip32_derivation(
-    seed: Annotated[SeedType, Query()],
+    seed: Annotated[SeedBody, Query()],
     derivation: DerivationType,
 ):
-    hdwallet: BIP32HD = await internal_bip32_derivation(seed, derivation)
+    hdwallet: BIP32HD = await internal_bip32_derivation(seed.seed, derivation)
     return {"pubkey": hdwallet.xpublic_key(), "prvkey": hdwallet.xprivate_key()}
 
 
 @router.post("/from_derivation/", description="HD Wallet Derivation", tags=["BIP 32"])
-async def post_bip32_derivation(payload: Bip32Derivation):
+async def post_bip32_derivation(payload: DerivationBody):
     seed = payload.seed
     derivation = payload.derivation
     hdwallet: BIP32HD = await internal_bip32_derivation(seed, derivation)
-    return {"pubkey": hdwallet.xpublic_key(), "prvkey": hdwallet.xprivate_key()}
+    return Keypair(pubkey=hdwallet.xpublic_key(), prvkey=hdwallet.xprivate_key())

@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from .mnemonic import router
+from .seed import router
 
 client = TestClient(router)
 
@@ -145,15 +145,31 @@ BIP39_TEST_VECTORS = [
 ]
 
 
-class TestMnemonicGetBip39TestVectors:
+class TestSeedGetBip39TestVectors:
     def test_bip39_test_vectors(self):
         for test_vector in BIP39_TEST_VECTORS:
             expected_entropy, mnemonic, expected_seed, _ = test_vector
 
-            response = client.get(f"/mnemonic/{mnemonic.replace(' ', '/')}")
+            response = client.get(f"/seed/from_words/{mnemonic.replace(' ', '/')}")
             assert response.status_code == 200
             assert response.json() == {
-                "mnemonic": mnemonic.split(),
                 "entropy": expected_entropy,
+                "mnemonic": mnemonic.split(),
+                "seed": expected_seed,
+            }
+
+
+class TestSeedPostBip39TestVectors:
+    def test_bip39_test_vectors(self):
+        for test_vector in BIP39_TEST_VECTORS:
+            expected_entropy, mnemonic, expected_seed, _ = test_vector
+
+            response = client.post(
+                "/seed/from_entropy/", json={"entropy": expected_entropy}
+            )
+            assert response.status_code == 200
+            assert response.json() == {
+                "entropy": expected_entropy,
+                "mnemonic": mnemonic.split(),
                 "seed": expected_seed,
             }

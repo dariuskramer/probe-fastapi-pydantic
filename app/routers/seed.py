@@ -4,7 +4,8 @@ from hdwallet.entropies.bip39 import BIP39Entropy
 from hdwallet.mnemonics.bip39 import BIP39Mnemonic, BIP39_MNEMONIC_LANGUAGES
 from hdwallet.seeds.bip39 import BIP39Seed
 from pydantic import AfterValidator, BaseModel
-from .constants import HEXADECIMAL_PATTERN
+
+from app.routers import HEXADECIMAL_PATTERN, SeedType
 
 router = APIRouter(prefix="/seed")
 

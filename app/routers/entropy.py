@@ -1,4 +1,5 @@
 from typing import Annotated
+
 from fastapi import APIRouter
 from hdwallet.entropies.bip39 import BIP39Entropy
 from pydantic import AfterValidator, Field

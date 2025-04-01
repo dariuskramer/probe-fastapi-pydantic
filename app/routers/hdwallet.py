@@ -1,10 +1,12 @@
-from typing import Annotated, ClassVar, TypeAlias
+from typing import Annotated, ClassVar
+
 from fastapi import APIRouter, Query
-from pydantic import BaseModel, ConfigDict, Field
+from hdwallet.cryptocurrencies import Bitcoin
 from hdwallet.derivations import CustomDerivation
 from hdwallet.hds import BIP32HD
-from hdwallet.cryptocurrencies import Bitcoin
-from .constants import HEXADECIMAL_PATTERN, DERIVATION_PATTERN
+from pydantic import BaseModel, ConfigDict
+
+from app.routers import DerivationType, SeedType
 
 router: APIRouter = APIRouter(prefix="/hdwallet")
 
@@ -16,14 +18,6 @@ async def internal_bip32_derivation(seed: str, derivation: str) -> BIP32HD:
         .from_derivation(derivation=CustomDerivation(path=derivation))
     )
     return hdwallet
-
-
-SeedType: TypeAlias = Annotated[
-    str, Field(min_length=32, max_length=128, pattern=HEXADECIMAL_PATTERN)
-]
-DerivationType: TypeAlias = Annotated[
-    str, Field(min_length=1, pattern=DERIVATION_PATTERN)
-]
 
 
 class Bip32Seed(BaseModel):

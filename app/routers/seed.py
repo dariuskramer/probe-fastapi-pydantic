@@ -30,7 +30,7 @@ def check_wordlist(mnemonic: str) -> str:
     raise ValueError(f"mnemonic is not valid: {mnemonic}")
 
 
-@router.get("/from_words/{mnemonic:path}")
+@router.get("/from_words/{mnemonic:path}", tags=["Seed"])
 async def get_seed_from_words(
     mnemonic: Annotated[str, AfterValidator(check_wordlist)],
 ) -> SeedResponse:
@@ -47,7 +47,7 @@ async def get_seed_from_words(
     )
 
 
-@router.post("/from_entropy/")
+@router.post("/from_entropy/", tags=["Seed"])
 async def get_seed_from_entropy(entropy: EntropyBody) -> SeedResponse:
     bip39_entropy: BIP39Entropy = BIP39Entropy(entropy=entropy.entropy)
     bip39_mnemonic: str = BIP39Mnemonic.from_entropy(

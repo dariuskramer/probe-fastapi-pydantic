@@ -38,7 +38,7 @@ class Keypair(BaseModel):
 @router.get(
     "/from_derivation/{derivation:path}",
     description="HD Wallet Derivation",
-    tags=["BIP 32"],
+    tags=["Keypair"],
 )
 async def get_bip32_derivation(
     seed: Annotated[SeedBody, Query()],
@@ -48,7 +48,7 @@ async def get_bip32_derivation(
     return {"pubkey": hdwallet.xpublic_key(), "prvkey": hdwallet.xprivate_key()}
 
 
-@router.post("/from_derivation/", description="HD Wallet Derivation", tags=["BIP 32"])
+@router.post("/from_derivation/", description="HD Wallet Derivation", tags=["Keypair"])
 async def post_bip32_derivation(payload: DerivationBody):
     seed = payload.seed
     derivation = payload.derivation

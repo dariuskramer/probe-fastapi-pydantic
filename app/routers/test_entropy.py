@@ -6,6 +6,14 @@ from .entropy import router
 client = TestClient(router)
 
 
+class TestEntropyRoutesErrors:
+    def test_root(self):
+        response = client.get("/entropy")
+        assert response.status_code == 404
+        response = client.get("/entropy/")
+        assert response.status_code == 404
+
+
 class TestEntropyGetGenerateErrors:
     def test_generate_less_than_minimum(self):
         with pytest.raises(RequestValidationError):
@@ -18,6 +26,10 @@ class TestEntropyGetGenerateErrors:
     def test_generate_invalid_strength(self):
         with pytest.raises(RequestValidationError):
             _ = client.get("/entropy/generate/129")
+
+    def test_generate_invalid_param(self):
+        with pytest.raises(RequestValidationError):
+            _ = client.get("/entropy/generate/abc")
 
     def test_generate_missing_strength(self):
         response = client.get("/entropy/generate/")

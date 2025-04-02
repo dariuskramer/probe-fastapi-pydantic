@@ -43,9 +43,9 @@ class Keypair(BaseModel):
 async def get_bip32_derivation(
     seed: Annotated[SeedBody, Query()],
     derivation: DerivationType,
-):
+) -> Keypair:
     hdwallet: BIP32HD = await internal_bip32_derivation(seed.seed, derivation)
-    return {"pubkey": hdwallet.xpublic_key(), "prvkey": hdwallet.xprivate_key()}
+    return Keypair(pubkey=hdwallet.xpublic_key(), prvkey=hdwallet.xprivate_key())
 
 
 @router.post(
@@ -53,7 +53,7 @@ async def get_bip32_derivation(
     summary="Generate a keypair from a BIP32 derivation path",
     response_description="A public/private key pair",
 )
-async def post_bip32_derivation(payload: DerivationBody):
+async def post_bip32_derivation(payload: DerivationBody) -> Keypair:
     seed = payload.seed
     derivation = payload.derivation
     hdwallet: BIP32HD = await internal_bip32_derivation(seed, derivation)

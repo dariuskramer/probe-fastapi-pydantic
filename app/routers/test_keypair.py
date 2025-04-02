@@ -6,7 +6,15 @@ from .keypair import router
 client = TestClient(router)
 
 
-class TestHDWalletPostBip32Errors:
+class TestKeypairRouteErrors:
+    def test_root(self):
+        response = client.get("/keypair")
+        assert response.status_code == 404
+        response = client.get("/keypair/")
+        assert response.status_code == 404
+
+
+class TestKeypairPostBip32Errors:
     def test_bip32_seed_only(self):
         seed = "0123456789abcdef0123456789abcdef"
         response = client.post("/keypair/from_derivation/", json={"seed": seed})
@@ -66,7 +74,7 @@ class TestHDWalletPostBip32Errors:
             )
 
 
-class TestHDWalletPostBip32SeedVector1:
+class TestKeypairPostBip32SeedVector1:
     SEED: str = "000102030405060708090a0b0c0d0e0f"
 
     def test_bip32_derivation_root_path(self):
@@ -142,7 +150,7 @@ class TestHDWalletPostBip32SeedVector1:
         assert response.json() == {"pubkey": expected_pub, "prvkey": expected_prv}
 
 
-class TestHDWalletPostBip32SeedVector2:
+class TestKeypairPostBip32SeedVector2:
     SEED: str = "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542"
 
     def test_chain_m(self):
@@ -218,7 +226,7 @@ class TestHDWalletPostBip32SeedVector2:
         assert response.json() == {"pubkey": expected_pub, "prvkey": expected_prv}
 
 
-class TestHDWalletGetBip32Errors:
+class TestKeypairGetBip32Errors:
     def test_bip32_seed_missing(self):
         with pytest.raises(RequestValidationError):
             _ = client.get("/keypair/from_derivation/m?seed=")
@@ -244,7 +252,7 @@ class TestHDWalletGetBip32Errors:
             _ = client.get(f"/keypair/from_derivation/{derivation}?seed={seed}")
 
 
-class TestHDWalletGetBip32SeedVector1:
+class TestKeypairGetBip32SeedVector1:
     SEED: str = "000102030405060708090a0b0c0d0e0f"
 
     def test_bip32_derivation_root_path(self):
@@ -302,7 +310,7 @@ class TestHDWalletGetBip32SeedVector1:
         assert response.json() == {"pubkey": expected_pub, "prvkey": expected_prv}
 
 
-class TestHDWalletGetBip32SeedVector2:
+class TestKeypairGetBip32SeedVector2:
     SEED: str = "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542"
 
     def test_chain_m(self):

@@ -1,4 +1,6 @@
+from fastapi.exceptions import RequestValidationError
 from fastapi.testclient import TestClient
+import pytest
 from .seed import router
 
 client = TestClient(router)
@@ -173,3 +175,46 @@ class TestSeedPostBip39TestVectors:
                 "mnemonic": mnemonic.split(),
                 "seed": expected_seed,
             }
+
+
+class TestSeedRouteErrors:
+    def test_root(self):
+        response = client.get("/seed")
+        assert response.status_code == 404
+        response = client.get("/seed/")
+        assert response.status_code == 404
+
+
+class TestSeedErrors:
+    def test_seed_words_missing(self):
+        with pytest.raises(RequestValidationError):
+            _ = client.get("/seed/from_words/")
+
+    def test_seed_words_root(self):
+        with pytest.raises(RequestValidationError):
+            _ = client.get("/seed/from_words")
+
+    def test_seed_words_not_enough(self):
+        with pytest.raises(RequestValidationError):
+            _ = client.get("/seed/from_words/legal/winner")
+
+    def test_seed_words_too_much(self):
+        with pytest.raises(RequestValidationError):
+            _ = client.get(
+                "/seed/from_words/legal/winner/thank/year/wave/sausage/worth/useful/legal/winner/thank/yellow/yellow"
+            )
+
+    def test_seed_entropy_too_short(self):
+        body = "0123456789abcdef0123456789abcde"
+        with pytest.raises(RequestValidationError):
+            _ = client.post("/seed/from_entropy", json=body)
+
+    def test_seed_entropy_too_much(self):
+        body = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"
+        with pytest.raises(RequestValidationError):
+            _ = client.post("/seed/from_entropy", json=body)
+
+    def test_seed_entropy_invalid_hex(self):
+        body = "0123456789abcdef0123456789xbcdef0123456789abcdef0123456789abcdef"
+        with pytest.raises(RequestValidationError):
+            _ = client.post("/seed/from_entropy", json=body)

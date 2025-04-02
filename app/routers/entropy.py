@@ -16,6 +16,7 @@ def check_strength(strength: int) -> int:
 @router.get(
     "/generate/{strength}",
     summary="Generate entropy with a fixed strength",
+    response_description="Hex formatted entropy",
 )
 async def get_entropy_generate_with_size(
     strength: Annotated[int, Field(ge=128, le=256), AfterValidator(check_strength)],

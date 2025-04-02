@@ -31,7 +31,9 @@ def check_wordlist(mnemonic: str) -> str:
 
 
 @router.get(
-    "/from_words/{mnemonic:path}", summary="Generate a BIP32 seed from a BIP39 mnemonic"
+    "/from_words/{mnemonic:path}",
+    summary="Generate a BIP32 seed from a BIP39 mnemonic",
+    response_description="a BIP32 seed, with the mnemonic that generated it",
 )
 async def get_seed_from_words(
     mnemonic: Annotated[str, AfterValidator(check_wordlist)],
@@ -49,7 +51,11 @@ async def get_seed_from_words(
     )
 
 
-@router.post("/from_entropy/", summary="Generate a BIP32 seed from entropy")
+@router.post(
+    "/from_entropy/",
+    summary="Generate a BIP32 seed from entropy",
+    response_description="a BIP32 seed, with the mnemonic that generated it",
+)
 async def get_seed_from_entropy(entropy: EntropyBody) -> SeedResponse:
     bip39_entropy: BIP39Entropy = BIP39Entropy(entropy=entropy.entropy)
     bip39_mnemonic: str = BIP39Mnemonic.from_entropy(

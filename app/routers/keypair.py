@@ -38,6 +38,7 @@ class Keypair(BaseModel):
 @router.get(
     "/from_derivation/{derivation:path}",
     summary="Generate a keypair from a BIP32 derivation path",
+    response_description="A public/private key pair",
 )
 async def get_bip32_derivation(
     seed: Annotated[SeedBody, Query()],
@@ -48,7 +49,9 @@ async def get_bip32_derivation(
 
 
 @router.post(
-    "/from_derivation/", summary="Generate a keypair from a BIP32 derivation path"
+    "/from_derivation/",
+    summary="Generate a keypair from a BIP32 derivation path",
+    response_description="A public/private key pair",
 )
 async def post_bip32_derivation(payload: DerivationBody):
     seed = payload.seed

@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from hdwallet.entropies.bip39 import BIP39Entropy
 from pydantic import AfterValidator, Field
 
-router = APIRouter(prefix="/entropy")
+router = APIRouter(prefix="/entropy", tags=["Entropy"])
 
 
 def check_strength(strength: int) -> int:
@@ -16,7 +16,6 @@ def check_strength(strength: int) -> int:
 @router.get(
     "/generate/{strength}",
     description="Generate entropy with a fixed strength",
-    tags=["Entropy"],
 )
 async def get_entropy_generate_with_size(
     strength: Annotated[int, Field(ge=128, le=256), AfterValidator(check_strength)],

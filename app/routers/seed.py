@@ -8,7 +8,7 @@ from pydantic import AfterValidator, BaseModel, ConfigDict
 
 from app.routers import HEXADECIMAL_PATTERN, SeedType
 
-router = APIRouter(prefix="/seed")
+router = APIRouter(prefix="/seed", tags=["Seed"])
 
 
 class EntropyBody(BaseModel):
@@ -30,7 +30,7 @@ def check_wordlist(mnemonic: str) -> str:
     raise ValueError(f"mnemonic is not valid: {mnemonic}")
 
 
-@router.get("/from_words/{mnemonic:path}", tags=["Seed"])
+@router.get("/from_words/{mnemonic:path}")
 async def get_seed_from_words(
     mnemonic: Annotated[str, AfterValidator(check_wordlist)],
 ) -> SeedResponse:
@@ -47,7 +47,7 @@ async def get_seed_from_words(
     )
 
 
-@router.post("/from_entropy/", tags=["Seed"])
+@router.post("/from_entropy/")
 async def get_seed_from_entropy(entropy: EntropyBody) -> SeedResponse:
     bip39_entropy: BIP39Entropy = BIP39Entropy(entropy=entropy.entropy)
     bip39_mnemonic: str = BIP39Mnemonic.from_entropy(
